@@ -7,10 +7,25 @@ router.get('/total', (req, res) => {
     productModel
         .find()
         .then(results => {
-            res.json({
+            // res.json({
+            //     count: results.length,
+            //     products: results
+            // })
+            const response = {
                 count: results.length,
-                products: results
-            })
+                products: results.map(result => {
+                    return{
+                        id: result._id,
+                        name: result.name,
+                        price: result.price,
+                        request: {
+                            type: "GET",
+                            url: "http://localhost:3000/products/" + result._id
+                        }
+                    }
+                })
+            }
+            res.json(response)
         })
         .catch(err => {
             res.json({
@@ -31,7 +46,15 @@ router.get('/:productId', (req, res) => {
         .then(doc => {
             res.json({
                 message: "get product data from " + id,
-                productInfo : doc
+                productInfo : {
+                    id: doc._id,
+                    name: doc.name,
+                    price: doc.price,
+                    request: {
+                        type: "GET",
+                        url: "http://localhost:3000/products/total"
+                    }
+                }
             })
         })
         .catch(err => {
@@ -53,7 +76,15 @@ router.post('/register', (req, res) => {
         .then(doc => {
             res.json({
                 message: "saved data",
-                productInfo: doc
+                productInfo: {
+                    id: doc._id,
+                    name: doc.name,
+                    price: doc.price,
+                    request: {
+                        type: "GET",
+                        url: "http://localhost:3000/products/" + doc._id
+                    }
+                }
             })
         })
         .catch(err => {
@@ -84,7 +115,11 @@ router.put('/:productId', (req, res) => {
         .then(result => {
             console.log("result is ", result)
             res.json({
-                message: "updated product at " + id
+                message: "updated product at " + id,
+                request: {
+                    type: "GET",
+                    url: "http://localhost:3000/products?" + id
+                }
             })
         })
         .catch(err => {
@@ -107,7 +142,11 @@ router.delete('/:productId', (req, res) => {
         .findByIdAndDelete(id)
         .then(result => {
             res.json({
-                message: "deleted product at " + id
+                message: "deleted product at " + id,
+                request: {
+                    type: "GET",
+                    url: "http://localhost:3000/products/total"
+                }
             })
         })
         .catch(err => {
