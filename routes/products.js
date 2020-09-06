@@ -118,7 +118,7 @@ router.put('/:productId', (req, res) => {
                 message: "updated product at " + id,
                 request: {
                     type: "GET",
-                    url: "http://localhost:3000/products?" + id
+                    url: "http://localhost:3000/products" + id
                 }
             })
         })

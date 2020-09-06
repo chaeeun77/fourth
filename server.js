@@ -12,7 +12,8 @@ require('./config/db')
 // })
 
 const productRoutes = require('./routes/products');
-const orderRoutes = require('./routes/orders')
+const orderRoutes = require('./routes/orders');
+const userRoutes = require('./routes/user');
 
 
 //middle wear 설정
@@ -25,6 +26,7 @@ app.use(bodyParser.urlencoded({extended: false}))
 //router
 app.use('/products', productRoutes)
 app.use('/orders', orderRoutes)
+app.use('/user', userRoutes)
 
 // const PORT = 3000;
 const PORT = process.env.PORT || 7000;
