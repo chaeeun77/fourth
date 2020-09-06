@@ -9,8 +9,7 @@ module.exports = (req, res, next) => {
         next();
     } catch (error) {
         return res.json({
-            message: 'Auth failed',
-            errInfo: error
+            message: 'Auth failed'
         }) //catch에서 어떤것을 잡을거냐 error로 상수화시킴.
     }
 

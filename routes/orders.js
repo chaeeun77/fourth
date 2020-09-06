@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const orderModel = require('../models/orders')
 const productModel = require('../models/product')
+const checkAuth = require('../middleware/check-atuh')
 
 //order(장바구니) data 불러오기
-router.get('/total', (req, res) => {
+router.get('/total', checkAuth, (req, res) => {
     orderModel
         .find()
         .populate('product', ['name', 'price'])
@@ -36,7 +37,7 @@ router.get('/total', (req, res) => {
 })
 
 //order detail get API
-router.get('/:orderId', (req, res) => {
+router.get('/:orderId', checkAuth, (req, res) => {
     const id = req.params.orderId
 
     orderModel
@@ -64,7 +65,7 @@ router.get('/:orderId', (req, res) => {
 })
 
 //order data 생성하기
-router.post('/', (req, res) => {
+router.post('/', checkAuth, (req, res) => {
 
     productModel
         .findById(req.body.productId)
@@ -104,7 +105,7 @@ router.post('/', (req, res) => {
 })
 
 //order data 업데이트하기
-router.put('/:productId', (req, res) => {
+router.put('/:productId', checkAuth, (req, res) => {
     const id = req.params.productId
     const updateOps = {};
     for(const ops of req.body) {
@@ -133,7 +134,7 @@ router.put('/:productId', (req, res) => {
 })
 
 //order data delte하기
-router.delete('/:productId', (req, res) => {
+router.delete('/:productId', checkAuth, (req, res) => {
     const id = req.params.productId
 
     orderModel

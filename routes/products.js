@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const productModel = require('../models/product')
+const checkAuth =  require('../middleware/check-atuh')
 
 //product data 불러오기
 router.get('/total', (req, res) => {
@@ -64,8 +65,8 @@ router.get('/:productId', (req, res) => {
         })
 })
 
-//product data 생성하기
-router.post('/register', (req, res) => {
+//product data 생성하기, 로그인을 해야 제품을 등록할 수 있다.
+router.post('/register', checkAuth, (req, res) => {
     const newProduct = new productModel({
         name: req.body.productname,
         price : req.body.productprice
@@ -103,7 +104,7 @@ router.post('/register', (req, res) => {
 })
 
 //product data 업데이트하기
-router.put('/:productId', (req, res) => {
+router.put('/:productId', checkAuth, (req, res) => {
     const id = req.params.productId
     const updateOps = {};
     for(const ops of req.body) {
@@ -135,7 +136,7 @@ router.put('/:productId', (req, res) => {
 // })
 
 //product data delete하기
-router.delete('/:productId', (req, res) => {
+router.delete('/:productId', checkAuth, (req, res) => {
     const id = req.params.productId
 
     productModel
