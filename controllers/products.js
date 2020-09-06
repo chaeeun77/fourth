@@ -6,10 +6,7 @@ exports.products_get_all = (req, res) => {
     productModel
         .find()
         .then(results => {
-            // res.json({
-            //     count: results.length,
-            //     products: results
-            // })
+
             const response = {
                 count: results.length,
                 products: results.map(result => {
@@ -37,9 +34,12 @@ exports.products_get_all = (req, res) => {
 };
 
 exports.products_create_product = (req, res) => {
+
+    const { name, price } = req.body
+
+
     const newProduct = new productModel({
-        name: req.body.productname,
-        price : req.body.productprice
+        name, price
     })
 
     newProduct
@@ -63,14 +63,6 @@ exports.products_create_product = (req, res) => {
                 message: err.message
             })
         })
-    // const product = {
-    //     name: req.body.productname,
-    //     price: req.body.productprice
-    // }
-    // res.json({
-    //     message: 'product data 생성하기',
-    //     createdProduct: product //우리가 입력한 값을 보여주겠다.
-    // })
 };
 
 exports.products_get_product = (req, res) => {

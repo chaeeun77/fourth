@@ -6,8 +6,11 @@ const jwt = require('jsonwebtoken')
 
 exports.users_create_user = (req, res) => {
     //email 중복체크 => password 암호화 => database 저장 (이걸 역으로 진행한다.)
+
+    const { email, password, username } = req.body;
+
     userModel
-        .findOne({email: req.body.useremail})
+        .findOne({email})
         .then(user => {
             if(user) {
                 return res.json({
@@ -22,9 +25,7 @@ exports.users_create_user = (req, res) => {
                     }
                     else {
                         const newUser = new userModel({
-                            username: req.body.name,
-                            email: req.body.useremail,
-                            password: hash
+                            username, email, password: hash
                         })
 
                         newUser
@@ -53,19 +54,18 @@ exports.users_create_user = (req, res) => {
 
 exports.users_post_login = (req, res) => {
     //이메일 유무 체크 -> 패스워드 매칭 -> return jwt
+
+    const { email, password, username } = req.body;
+
     userModel
-        .findOne({email: req.body.useremail})
+        .findOne({email})
         .then(user => {
             if(!user) {
                 return res.json({
                     message: "이메일이 존재하지 않습니다."
                 })
             } else {
-                // return res.json({
-                //     message: "success login",
-                //     loginInfo: user
-                // })
-                bcrypt.compare(req.body.pw, user.password, (err, result) => {
+                bcrypt.compare(password, user.password, (err, result) => {
                     if(err || result === false){
                         return res.json({
                             success: result,

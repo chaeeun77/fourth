@@ -27,19 +27,17 @@ exports.orders_get_all = (req, res) => {
                 message: err.message
             })
         })
-    // res.json({
-    //     message: 'order data 불러오기'
-    // })
 };
 
 exports.orders_create_order = (req, res) => {
+
+    const { product, quantity } = req.body
 
     productModel
         .findById(req.body.productId)
         .then(product => {
             const newOrder = new orderModel({
-                product: req.body.productId,
-                quantity: req.body.qty
+                product, quantity
             })
 
             newOrder
@@ -121,9 +119,6 @@ exports.orders_update_order = (req, res) => {
                 message: err.message
             })
         })
-    // res.json({
-    //     message: 'order data 업데이트하기'
-    // })
 };
 
 exports.orders_delete_order = (req, res) => {
