@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router()
 const userModel = require('../models/user')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 
 //회원가입
@@ -55,6 +56,7 @@ router.post('/register', (req, res) => {
 
 //로그인
 router.post('/login', (req, res) => {
+    //이메일 유무 체크 -> 패스워드 매칭 -> return jwt
     userModel
         .findOne({email: req.body.useremail})
         .then(user => {
@@ -70,10 +72,20 @@ router.post('/login', (req, res) => {
                 bcrypt.compare(req.body.pw, user.password, (err, result) => {
                     if(err || result === false){
                         return res.json({
+                            success: result,
                             message: "password incorrect"
                         })
                     } else {
-                        res.json(user)
+                        // res.json(user)
+                        const token = jwt.sign(
+                            {email: user.email, id: user._id},
+                            "secret",
+                            {expiresIn: "1d"} //1d : 하루, 1m : 한달
+                        )
+                        res.json({
+                            success: result,
+                            token: token
+                        })
                     }
                 })
 
