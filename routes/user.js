@@ -63,9 +63,18 @@ router.post('/login', (req, res) => {
                     message: "이메일이 존재하지 않습니다."
                 })
             } else {
-                return res.json({
-                    message: "success login",
-                    loginInfo: user
+                // return res.json({
+                //     message: "success login",
+                //     loginInfo: user
+                // })
+                bcrypt.compare(req.body.pw, user.password, (err, result) => {
+                    if(err || result === false){
+                        return res.json({
+                            message: "password incorrect"
+                        })
+                    } else {
+                        res.json(user)
+                    }
                 })
 
             }
