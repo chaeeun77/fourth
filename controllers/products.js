@@ -2,8 +2,6 @@ const productModel = require('../models/product')
 
 
 
-
-
 exports.products_get_all = (req, res) => {
     productModel
         .find()

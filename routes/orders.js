@@ -4,158 +4,37 @@ const orderModel = require('../models/orders')
 const productModel = require('../models/product')
 const checkAuth = require('../middleware/check-atuh')
 
+const {
+    orders_get_all,
+    orders_create_order,
+    orders_get_product,
+    orders_update_order,
+    orders_delete_order
+} = require('../controllers/orders')
+
 //order(장바구니) data 불러오기
-router.get('/total', checkAuth, (req, res) => {
-    orderModel
-        .find()
-        .populate('product', ['name', 'price'])
-        .then(results => {
-            const response = {
-                count: results.length,
-                orders: results.map(result => {
-                    return{
-                        id: result._id,
-                        product: result.product,
-                        quantity: result.quantity,
-                        request: {
-                            type: 'GET',
-                            url: "http://localhost:3000/orders/" + result._id
-                        }
-                    }
-                })
-            }
-            res.json(response)
-        })
-        .catch(err => {
-            res.json({
-                message: err.message
-            })
-        })
-    // res.json({
-    //     message: 'order data 불러오기'
-    // })
-})
+router.get('/total', checkAuth, orders_get_all)
+
+
 
 //order detail get API
-router.get('/:orderId', checkAuth, (req, res) => {
-    const id = req.params.orderId
+router.get('/:orderId', checkAuth, orders_get_product)
 
-    orderModel
-        .findById(id)
-        .populate('product', ['name', 'price'])
-        .then(doc => {
-            res.json({
-                message: "get order data from " + id,
-                orderInfo: {
-                    id: doc._id,
-                    product: doc.product,
-                    quantity: doc.quantity,
-                    request: {
-                        type: "GET",
-                        url: "http://localhost:3000/orders/total"
-                    }
-                }
-            })
-        })
-        .catch(err => {
-            res.json({
-                message: err.message
-            })
-        })
-})
+
 
 //order data 생성하기
-router.post('/', checkAuth, (req, res) => {
+router.post('/', checkAuth, orders_create_order)
 
-    productModel
-        .findById(req.body.productId)
-        .then(product => {
-            const newOrder = new orderModel({
-                product: req.body.productId,
-                quantity: req.body.qty
-            })
 
-            newOrder
-                .save()
-                .then(doc => {
-                    res.json({
-                        message: "saved order",
-                        productInfo: {
-                            id: doc._id,
-                            product: doc.product,
-                            quantity: doc.quantity,
-                            request: {
-                                type: "GET",
-                                url: "http://localhost:3000/orders/" + doc._id
-                            }
-                        }
-                    })
-                })
-                .catch(err=> {
-                    res.json({
-                        message: err.message
-                    })
-                })
-        })
-        .catch(err => {
-            res.json({
-                message: "product not found"
-            })
-        })
-})
 
 //order data 업데이트하기
-router.put('/:productId', checkAuth, (req, res) => {
-    const id = req.params.productId
-    const updateOps = {};
-    for(const ops of req.body) {
-        updateOps[ops.propName] = ops.value
-    }
+router.put('/:productId', checkAuth, orders_update_order)
 
-    orderModel
-        .findByIdAndUpdate(id, {$set: updateOps})
-        .then(result => {
-            res.json({
-                message: "updated order at " + id,
-                request: {
-                    type: "GET",
-                    url: "http://localhost:3000/orders" + id
-                }
-            })
-        })
-        .catch(err => {
-            res.json({
-                message: err.message
-            })
-        })
-    // res.json({
-    //     message: 'order data 업데이트하기'
-    // })
-})
+
 
 //order data delte하기
-router.delete('/:productId', checkAuth, (req, res) => {
-    const id = req.params.productId
+router.delete('/:productId', checkAuth, orders_delete_order)
 
-    orderModel
-        .findByIdAndDelete(id)
-        .then(result => {
-            res.json({
-                message: "deleted order at " + id,
-                request: {
-                    type: "GET",
-                    url: "http://localhost:3000/orders/total"
-                }
-            })
-        })
-        .catch(err => {
-            res.json({
-                message: err.message
-            })
-        })
-    // res.json({
-    //     message: 'order data delete하기'
-    // })
-})
+
 
 module.exports = router;

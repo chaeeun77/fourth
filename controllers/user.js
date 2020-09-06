@@ -1,5 +1,95 @@
+const userModel = require('../models/user')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 
 
+exports.users_create_user = (req, res) => {
+    //email 중복체크 => password 암호화 => database 저장 (이걸 역으로 진행한다.)
+    userModel
+        .findOne({email: req.body.useremail})
+        .then(user => {
+            if(user) {
+                return res.json({
+                    message: "이미 아이디가 존재합니다."
+                })
+            } else{
+                bcrypt.hash(req.body.pw, 10, (err, hash) => {
+                    if(err){
+                        return res.json({
+                            message: err.message
+                        })
+                    }
+                    else {
+                        const newUser = new userModel({
+                            username: req.body.name,
+                            email: req.body.useremail,
+                            password: hash
+                        })
 
+                        newUser
+                            .save()
+                            .then(user => {
+                                res.json({
+                                    message: "saved data",
+                                    userInfo: user
+                                })
+                            })
+                            .catch(err => {
+                                res.json({
+                                    message: err.message
+                                })
+                            })
+                    }
+                })
+            }
+        })
+        .catch(err => {
+            res.json({
+                message: err.message
+            })
+        })
+};
 
+exports.users_post_login = (req, res) => {
+    //이메일 유무 체크 -> 패스워드 매칭 -> return jwt
+    userModel
+        .findOne({email: req.body.useremail})
+        .then(user => {
+            if(!user) {
+                return res.json({
+                    message: "이메일이 존재하지 않습니다."
+                })
+            } else {
+                // return res.json({
+                //     message: "success login",
+                //     loginInfo: user
+                // })
+                bcrypt.compare(req.body.pw, user.password, (err, result) => {
+                    if(err || result === false){
+                        return res.json({
+                            success: result,
+                            message: "password incorrect"
+                        })
+                    } else {
+                        // res.json(user)
+                        const token = jwt.sign(
+                            {email: user.email, id: user._id},
+                            "secret",
+                            {expiresIn: "1d"} //1d : 하루, 1m : 한달
+                        )
+                        res.json({
+                            success: result,
+                            token: token
+                        })
+                    }
+                })
+
+            }
+        })
+        .catch(err => {
+            res.json({
+                message: err.message
+            })
+        })
+};
